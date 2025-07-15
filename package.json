@@ -52,7 +52,11 @@
     "db:init": "node -e \"new (require('./dist/services/sqlite-storage-service').SQLiteStorageService)(); console.log('Database initialized')\"",
     "docs:rebuild": "ts-node src/scripts/rebuild-database.ts",
     "sync:runtime-version": "node scripts/sync-runtime-version.js",
-    "prepare:publish": "./scripts/publish-npm.sh"
+    "prepare:publish": "./scripts/publish-npm.sh",
+    "setup:ai-web-agent": "node scripts/setup-ai-web-agent.js",
+    "test:ai-web-agent": "node scripts/test-ai-web-agent.js",
+    "build:ai-web-agent": "tsc && cp src/n8n/*.node.ts dist/n8n/",
+    "dev:ai-web-agent": "npm run build:ai-web-agent && npm run test:ai-web-agent"
   },
   "repository": {
     "type": "git",
@@ -92,15 +96,17 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3",
     "@modelcontextprotocol/sdk": "^1.13.2",
     "@n8n/n8n-nodes-langchain": "^1.100.1",
     "axios": "^1.10.0",
-    "better-sqlite3": "^11.10.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "n8n": "^1.101.1",
     "n8n-core": "^1.100.0",
     "n8n-workflow": "^1.98.0",
+    "openai": "^4.104.0",
+    "playwright": "^1.54.1",
     "sql.js": "^1.13.0",
     "uuid": "^10.0.0"
   },

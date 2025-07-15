@@ -1,0 +1,384 @@
+{
+  "workflows": [
+    {
+      "name": "AI Web Agent - Login and Data Extraction",
+      "description": "Demonstrates how to use the AI Web Agent to log into a website and extract specific data",
+      "nodes": [
+        {
+          "parameters": {
+            "operation": "fillForm",
+            "url": "https://example-site.com/login",
+            "aiProvider": "openai",
+            "taskDescription": "Login to the website using the provided credentials and navigate to the dashboard",
+            "formData": [
+              {
+                "fieldName": "email",
+                "fieldValue": "user@example.com",
+                "fieldType": "email"
+              },
+              {
+                "fieldName": "password",
+                "fieldValue": "securepassword123",
+                "fieldType": "password"
+              }
+            ],
+            "browserOptions": {
+              "headless": true,
+              "waitForNetworkIdle": true,
+              "delayBetweenActions": 1500
+            },
+            "advancedOptions": {
+              "maxInteractions": 5,
+              "successCriteria": "URL contains \"dashboard\" or text \"Welcome\" is visible",
+              "returnScreenshots": false,
+              "screenshotOnError": true
+            }
+          },
+          "name": "Login to Website",
+          "type": "aiWebAgent",
+          "typeVersion": 1,
+          "position": [260, 300]
+        },
+        {
+          "parameters": {
+            "operation": "extract",
+            "url": "={{$node['Login to Website'].json.result.finalUrl}}",
+            "aiProvider": "openai",
+            "taskDescription": "Extract the user's account balance and recent transactions from the dashboard",
+            "extractionRules": [
+              {
+                "dataName": "accountBalance",
+                "extractionDescription": "Find and extract the current account balance displayed on the page",
+                "cssSelector": ".balance-amount, .account-balance, [data-testid='balance']"
+              },
+              {
+                "dataName": "recentTransactions",
+                "extractionDescription": "Extract the list of recent transactions with amounts and dates"
+              }
+            ],
+            "browserOptions": {
+              "headless": true,
+              "waitForNetworkIdle": true
+            },
+            "advancedOptions": {
+              "returnScreenshots": true
+            }
+          },
+          "name": "Extract Account Data",
+          "type": "aiWebAgent",
+          "typeVersion": 1,
+          "position": [480, 300]
+        }
+      ],
+      "connections": {
+        "Login to Website": {
+          "main": [
+            [
+              {
+                "node": "Extract Account Data",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "name": "AI Web Agent - E-commerce Product Search",
+      "description": "Uses AI to search for products and compare prices across an e-commerce site",
+      "nodes": [
+        {
+          "parameters": {
+            "operation": "navigate",
+            "url": "https://example-shop.com",
+            "aiProvider": "anthropic",
+            "taskDescription": "Search for 'wireless headphones' and find the top 3 results with their prices and ratings",
+            "browserOptions": {
+              "headless": false,
+              "viewportWidth": 1920,
+              "viewportHeight": 1080,
+              "delayBetweenActions": 2000
+            },
+            "advancedOptions": {
+              "maxInteractions": 15,
+              "returnScreenshots": true,
+              "customSelectors": ".search-box, .product-item, .price, .rating",
+              "successCriteria": "text \"Search Results\" is visible"
+            }
+          },
+          "name": "Search Products",
+          "type": "aiWebAgent",
+          "typeVersion": 1,
+          "position": [260, 300]
+        },
+        {
+          "parameters": {
+            "operation": "extract",
+            "url": "={{$node['Search Products'].json.result.finalUrl}}",
+            "aiProvider": "anthropic",
+            "taskDescription": "Extract product details including name, price, rating, and availability for the top 5 search results",
+            "extractionRules": [
+              {
+                "dataName": "products",
+                "extractionDescription": "Extract an array of products with name, price, rating, and availability status",
+                "cssSelector": ".product-card, .product-item"
+              }
+            ],
+            "browserOptions": {
+              "headless": true
+            },
+            "advancedOptions": {
+              "returnScreenshots": false
+            }
+          },
+          "name": "Extract Product Details",
+          "type": "aiWebAgent",
+          "typeVersion": 1,
+          "position": [480, 300]
+        }
+      ],
+      "connections": {
+        "Search Products": {
+          "main": [
+            [
+              {
+                "node": "Extract Product Details",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "name": "AI Web Agent - Social Media Automation",
+      "description": "Automates posting content to social media platforms with AI assistance",
+      "nodes": [
+        {
+          "parameters": {
+            "operation": "navigate",
+            "url": "https://twitter.com/compose/tweet",
+            "aiProvider": "openai",
+            "taskDescription": "Navigate to the tweet composition page and post a tweet about AI automation",
+            "browserOptions": {
+              "headless": true,
+              "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+              "delayBetweenActions": 3000
+            },
+            "advancedOptions": {
+              "maxInteractions": 8,
+              "successCriteria": "text \"Tweet sent\" is visible or URL contains \"status\"",
+              "screenshotOnError": true
+            }
+          },
+          "name": "Post Tweet",
+          "type": "aiWebAgent",
+          "typeVersion": 1,
+          "position": [260, 300]
+        }
+      ]
+    },
+    {
+      "name": "AI Web Agent - Website Monitoring",
+      "description": "Monitors a website for changes and takes action when specific conditions are met",
+      "nodes": [
+        {
+          "parameters": {
+            "operation": "monitor",
+            "url": "https://example-news.com",
+            "aiProvider": "openai",
+            "taskDescription": "Monitor the website for new articles about AI or technology and alert when found",
+            "browserOptions": {
+              "headless": true,
+              "waitForNetworkIdle": true
+            },
+            "advancedOptions": {
+              "returnScreenshots": true,
+              "screenshotOnError": true
+            }
+          },
+          "name": "Monitor Website",
+          "type": "aiWebAgent",
+          "typeVersion": 1,
+          "position": [260, 300]
+        },
+        {
+          "parameters": {
+            "conditions": {
+              "boolean": [
+                {
+                  "id": "change-detected",
+                  "value1": "={{$node['Monitor Website'].json.result.changesDetected}}",
+                  "operation": "greaterThan",
+                  "value2": 0
+                }
+              ]
+            }
+          },
+          "name": "Check for Changes",
+          "type": "n8n-nodes-base.if",
+          "typeVersion": 1,
+          "position": [480, 300]
+        },
+        {
+          "parameters": {
+            "operation": "extract",
+            "url": "={{$node['Monitor Website'].json.url}}",
+            "aiProvider": "openai",
+            "taskDescription": "Extract the latest news headlines and check if any mention AI or technology",
+            "extractionRules": [
+              {
+                "dataName": "headlines",
+                "extractionDescription": "Extract all news headlines from the page",
+                "cssSelector": "h1, h2, h3, .headline, .title"
+              }
+            ],
+            "browserOptions": {
+              "headless": true
+            }
+          },
+          "name": "Extract Headlines",
+          "type": "aiWebAgent",
+          "typeVersion": 1,
+          "position": [700, 200]
+        }
+      ],
+      "connections": {
+        "Monitor Website": {
+          "main": [
+            [
+              {
+                "node": "Check for Changes",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Check for Changes": {
+          "main": [
+            [
+              {
+                "node": "Extract Headlines",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "name": "AI Web Agent - Form Automation with Validation",
+      "description": "Fills out complex forms with validation and error handling",
+      "nodes": [
+        {
+          "parameters": {
+            "operation": "fillForm",
+            "url": "https://example-form.com/contact",
+            "aiProvider": "openai",
+            "taskDescription": "Fill out the contact form with the provided information and handle any validation errors",
+            "formData": [
+              {
+                "fieldName": "firstName",
+                "fieldValue": "John",
+                "fieldType": "text"
+              },
+              {
+                "fieldName": "lastName",
+                "fieldValue": "Doe",
+                "fieldType": "text"
+              },
+              {
+                "fieldName": "email",
+                "fieldValue": "john.doe@example.com",
+                "fieldType": "email"
+              },
+              {
+                "fieldName": "phone",
+                "fieldValue": "+1-555-123-4567",
+                "fieldType": "text"
+              },
+              {
+                "fieldName": "subject",
+                "fieldValue": "Business Inquiry",
+                "fieldType": "select"
+              },
+              {
+                "fieldName": "message",
+                "fieldValue": "I am interested in your AI automation services. Please contact me to discuss potential collaboration opportunities.",
+                "fieldType": "text"
+              },
+              {
+                "fieldName": "newsletter",
+                "fieldValue": "true",
+                "fieldType": "checkbox"
+              }
+            ],
+            "browserOptions": {
+              "headless": false,
+              "delayBetweenActions": 2000,
+              "waitForNetworkIdle": true
+            },
+            "advancedOptions": {
+              "maxInteractions": 10,
+              "successCriteria": "text \"Thank you\" is visible or text \"Message sent\" is visible",
+              "returnScreenshots": true,
+              "screenshotOnError": true
+            }
+          },
+          "name": "Fill Contact Form",
+          "type": "aiWebAgent",
+          "typeVersion": 1,
+          "position": [260, 300]
+        }
+      ]
+    }
+  ],
+  "usage_examples": {
+    "basic_navigation": {
+      "description": "Basic website navigation and interaction",
+      "node_config": {
+        "operation": "navigate",
+        "url": "https://example.com",
+        "taskDescription": "Navigate to the homepage and click on the 'About Us' link",
+        "aiProvider": "openai"
+      }
+    },
+    "data_extraction": {
+      "description": "Extract specific data from a webpage",
+      "node_config": {
+        "operation": "extract",
+        "url": "https://news.ycombinator.com",
+        "taskDescription": "Extract the top 10 story titles and their scores",
+        "extractionRules": {
+          "dataName": "stories",
+          "extractionDescription": "Extract story titles and scores from the front page",
+          "cssSelector": ".storylink, .score"
+        }
+      }
+    },
+    "form_filling": {
+      "description": "Intelligent form filling with error handling",
+      "node_config": {
+        "operation": "fillForm",
+        "url": "https://forms.example.com/signup",
+        "taskDescription": "Sign up for an account with the provided information",
+        "formData": [
+          {
+            "fieldName": "username",
+            "fieldValue": "ai_user_123",
+            "fieldType": "text"
+          },
+          {
+            "fieldName": "email",
+            "fieldValue": "ai@example.com",
+            "fieldType": "email"
+          }
+        ]
+      }
+    }
+  }
+}
